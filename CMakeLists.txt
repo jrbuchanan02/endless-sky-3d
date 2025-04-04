@@ -67,26 +67,29 @@ project("Endless Sky" VERSION 0.10.13
 	LANGUAGES CXX)
 
 # Find the needed library dependencies.
-find_package(SDL2 CONFIG REQUIRED)
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
-if(NOT APPLE)
-	find_package(GLEW REQUIRED)
-endif()
 
+# will need to replace sdl2 with own equivalent built on devkitpro
+#find_package(SDL2 CONFIG REQUIRED)
+#find_package(PNG REQUIRED)
+#find_package(JPEG REQUIRED)
+#if(NOT APPLE)
+#	find_package(GLEW REQUIRED)
+#endif()
+
+# will need to replace openAL with own equivalent built on devkitpro
 # Only very new versions of OpenAL provide a config package, so try to find it manually.
-find_package(OpenAL CONFIG QUIET)
-if(NOT OpenAL_FOUND)
-	find_library(OPENAL openal REQUIRED)
-	add_library(OpenAL UNKNOWN IMPORTED)
-	add_library(OpenAL::OpenAL ALIAS OpenAL)
-	set_target_properties(OpenAL PROPERTIES IMPORTED_LOCATION "${OPENAL}")
-endif()
+# find_package(OpenAL CONFIG QUIET)
+# if(NOT OpenAL_FOUND)
+# 	find_library(OPENAL openal REQUIRED)
+# 	add_library(OpenAL UNKNOWN IMPORTED)
+# 	add_library(OpenAL::OpenAL ALIAS OpenAL)
+# 	set_target_properties(OpenAL PROPERTIES IMPORTED_LOCATION "${OPENAL}")
+# endif()
 
 # libmad doesn't provide native cmake support.
-find_path(LIBMAD_INCLUDE_DIR mad.h)
-find_library(LIBMAD_LIB_DEBUG NAMES mad libmad NAMES_PER_DIR PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/lib")
-find_library(LIBMAD_LIB_RELEASE NAMES mad libmad NAMES_PER_DIR PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib")
+#find_path(LIBMAD_INCLUDE_DIR mad.h)
+#find_library(LIBMAD_LIB_DEBUG NAMES mad libmad NAMES_PER_DIR PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/lib")
+#find_library(LIBMAD_LIB_RELEASE NAMES mad libmad NAMES_PER_DIR PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib")
 
 # Find the MinGW runtime DLLs.
 if(MINGW AND WIN32)
@@ -131,8 +134,9 @@ if(MINGW)
 endif()
 
 # Link with the general libraries.
-target_link_libraries(ExternalLibraries INTERFACE SDL2::SDL2 PNG::PNG JPEG::JPEG OpenAL::OpenAL
-	"$<IF:$<CONFIG:Debug>,${LIBMAD_LIB_DEBUG},${LIBMAD_LIB_RELEASE}>")
+#target_link_libraries(ExternalLibraries 
+#	INTERFACE SDL2::SDL2 PNG::PNG JPEG::JPEG OpenAL::OpenAL
+#	"$<IF:$<CONFIG:Debug>,${LIBMAD_LIB_DEBUG},${LIBMAD_LIB_RELEASE}>")
 
 # Link the needed OS-specific dependencies, if any.
 if(WIN32)
@@ -158,33 +162,34 @@ if(UNIX)
 endif()
 
 # Link with OpenGL or OpenGL ES.
-if(ES_GLES)
-	find_package(OpenGL REQUIRED OpenGL EGL)
-	target_link_libraries(ExternalLibraries INTERFACE OpenGL::OpenGL OpenGL::EGL)
-	target_compile_definitions(EndlessSkyLib PUBLIC ES_GLES)
-else()
-	# The Steam runtime can't rely on GLVND being available, so link against the legacy interface.
-	if(ES_STEAM)
-		set(OpenGL_GL_PREFERENCE "LEGACY")
-	endif()
-
-	find_package(OpenGL REQUIRED)
-	target_link_libraries(ExternalLibraries INTERFACE OpenGL::GL)
-
-	if(APPLE)
-		# Apple deprecated OpenGL in MacOS 10.14, but we don't care.
-		target_compile_definitions(EndlessSkyLib PUBLIC GL_SILENCE_DEPRECATION)
-	else()
-		# GLEW is only needed on Linux and Windows.
-		target_link_libraries(ExternalLibraries INTERFACE GLEW::glew)
-	endif()
-endif()
+# will need to replace opengl with own equivalent built on devkitpro libraries
+#if(ES_GLES)
+#	find_package(OpenGL REQUIRED OpenGL EGL)
+#	target_link_libraries(ExternalLibraries INTERFACE OpenGL::OpenGL OpenGL::EGL)
+#	target_compile_definitions(EndlessSkyLib PUBLIC ES_GLES)
+#else()
+#	# The Steam runtime can't rely on GLVND being available, so link against the legacy interface.
+#	if(ES_STEAM)
+#		set(OpenGL_GL_PREFERENCE "LEGACY")
+#	endif()
+#
+#	find_package(OpenGL REQUIRED)
+#	target_link_libraries(ExternalLibraries INTERFACE OpenGL::GL)
+#
+#	if(APPLE)
+#		# Apple deprecated OpenGL in MacOS 10.14, but we don't care.
+#		target_compile_definitions(EndlessSkyLib PUBLIC GL_SILENCE_DEPRECATION)
+#	else()
+#		# GLEW is only needed on Linux and Windows.
+#		target_link_libraries(ExternalLibraries INTERFACE GLEW::glew)
+#	endif()
+#endif()
 
 # Setup for the testing frameworks.
-include(CTest)
-if(BUILD_TESTING)
-	add_subdirectory(tests)
-endif()
+#include(CTest)
+#if(BUILD_TESTING)
+#	add_subdirectory(tests)
+#endif()
 
 # Create game target.
 if(APPLE AND ES_CREATE_BUNDLE)
